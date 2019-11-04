@@ -2,8 +2,8 @@
   <div style="font-size: 14px;">
     <div class="input__block relative">
       <p class="">Número de tarjeta</p>
-      <img v-if="ccBankIs(CC_BANKS.VISA)" class="input--cardBrand" :src="visa" height="32px" alt="Visa" />
-      <img v-if="ccBankIs(CC_BANKS.MASTERCARD)" class="input--cardBrand" src="@/static/images/mastercard-512.png" height="32px" alt="Mastercard" />
+      <img v-if="ccBankIs(CC_BANKS.VISA)" class="input--cardBrand" src="../assets/images/visa-512.png" height="32px" alt="Visa" />
+      <img v-if="ccBankIs(CC_BANKS.MASTERCARD)" class="input--cardBrand" src="../assets/images/mastercard-512.png" height="32px" alt="Mastercard" />
       <img v-if="ccBankIs(CC_BANKS.AMEX)" class="input--cardBrand" src="../assets/images/amex-512.png" height="32px" alt="Amex" />
       <input
         class="input input--100"
@@ -99,8 +99,8 @@
             <div style="padding-top: 10px; position: relative;">
               <p class="cc__cvc__icon" @click="switchCVCIcon">?</p>
               <p class="cc__cvc__helpbox" v-if="showCVCHelp">
-                <img v-if="ccBank === CC_BANKS.AMEX" src="static/images/cvv-amex.png" alt="CVV">
-                <img v-else src="static/images/cvv.png" alt="CVV">
+                <img v-if="ccBank === CC_BANKS.AMEX" src="../assets/images/cvv-amex.png" alt="CVV">
+                <img v-else src="../assets/images/cvv.png" alt="CVV">
               </p>
               <p class="cc__cvc__helpbox__triangle" v-if="showCVCHelp"></p>
 
@@ -111,7 +111,7 @@
       </div>
     </div>
 
-    <div class="input__block">
+    <!-- <div class="input__block">
       <p class="">Nombre del Titular</p>
       <input
         class="input input--100"
@@ -120,9 +120,9 @@
         @blur="handlerBluredName"
       />
       <p v-if="!validName && nameBlured" class="error">El campo nombre del titular es requerido</p>
-    </div>
+    </div> -->
 
-    <div class="input__block">
+    <!-- <div class="input__block">
       <p class="">Dirección</p>
       <input
         class="input input--100"
@@ -131,9 +131,9 @@
         @blur="handlerBluredAddress"
       />
       <p v-if="!validAddress && addressBlured" class="error">El campo dirección es requerido</p>
-    </div>
+    </div> -->
 
-    <div class="input__block">
+    <!-- <div class="input__block">
       <p class="">Código Postal</p>
       <input
         class="input input--50"
@@ -144,8 +144,7 @@
         @blur="handlerBluredCP"
       />
       <p v-if="!validCP && cpBlured" class="error">El campo código postal es requerido</p>
-    </div>
-
+    </div> -->
   </div>
 </template>
 
@@ -153,12 +152,12 @@
 import {
   CC_BANKS,
   CC_REGEX,
-} from '@/utils/constants';
+} from './utils/constants';
 import {
   CURRENT_MONTH,
   CURRENT_YEAR
 } from '@/utils/currentDates';
-import visa from './static/images/visa-512.png';
+import luhnTest from './utils/luhnAlgorithm';
 
 export default {
   props: {
@@ -169,24 +168,23 @@ export default {
   },
   data() {
     return {
-      visa,
       expMonth: '',
       expYear: '',
       form: {
         ccNumber: '',
         ccExpiration: '',
-        ccCvv: '',
-        ccName: '',
-        ccAddress: '',
-        ccPostalCode: ''
+        ccCvv: ''
+        // ccName: '',
+        // ccAddress: ''
+        // ccPostalCode: ''
       },
       validationsPassed: {
         cardNumber: false,
         cardExp: false,
-        ccCvv: false,
-        name: false,
-        address: false,
-        cp: false
+        ccCvv: false
+        // name: false,
+        // address: false
+        // cp: false
       },
       showCVCHelp: false,
       ccBank: '',
@@ -225,29 +223,7 @@ export default {
         return false;
       }
 
-      // The Luhn Algorithm.
-      const luhnCheck = num => {
-        if (/[^0-9-\s]+/.test(num)) return false;
-
-        var nCheck = 0, nDigit = 0, bEven = false;
-        num = num.replace(/\D/g, "");
-
-        for (var n = num.length - 1; n >= 0; n--) {
-          var cDigit = num.charAt(n);
-            nDigit = parseInt(cDigit, 10);
-
-          if (bEven) {
-            if ((nDigit *= 2) > 9) nDigit -= 9;
-          }
-
-          nCheck += nDigit;
-          bEven = !bEven;
-        }
-
-        return (nCheck % 10) == 0;
-      };
-
-      return testPassed.some(test => test === true) && luhnCheck(number);
+      return testPassed.some(test => test === true) && luhnTest(number);
     },
     validExp() {
       return this.expYear > CURRENT_YEAR
@@ -378,16 +354,11 @@ export default {
     validationsPassed: {
       deep: true,
       handler(data) {
-        const values = {
-          status: false,
-          form: {
-            ...this.form
-          }
-        };
+        let info = {};
         if (Object.values(data).every(item => item)) {
-          values.status = true;
+          info = this.form;
         }
-        this.$emit('ccOK', values);
+        this.$emit('input', info)
       }
     }
   }
@@ -395,7 +366,7 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "./scss/app";
+  @import "./assets/credit-card";
   .relative {
     position: relative;
   }

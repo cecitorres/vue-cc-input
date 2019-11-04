@@ -1,4 +1,4 @@
-# vue-credit-card-input
+# vue-cc-input
 
 ## Project setup
 ```

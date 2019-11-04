@@ -14,14 +14,14 @@ export const CC_REGEX = {
 export const CARD_BRAND_IMGS = {
   Visa: {
     name: 'Visa',
-    img: 'static/images/visa-512.png'
+    img: '../assets/images/visa-512.png'
   },
   MasterCard: {
     name: 'Mastercard',
-    img: 'static/images/mastercard-512.png'
+    img: '../assets/images/mastercard-512.png'
   },
   AmericanExpress: {
     name: 'American Express',
-    img: 'static/images/amex-512.png'
+    img: '../assets/images/amex-512.png'
   }
 };
