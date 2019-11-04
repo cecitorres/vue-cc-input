@@ -1,29 +1,28 @@
-# vue-cc-input
-
-## Project setup
+# A simple and powerful input for your credit card form
+## Install
 ```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
+npm install vue-cc-input
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
+## How to use it
+Just pass a variable for receive the credit card info (trigger only when all validations passed)
+```js
+<v-credit-card
+  v-model="form"
+  :banksPermited="[
+    'Visa',
+    'MasterCard',
+    'Amex'
+  ]"
+/>
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Validations
+Include some cool validations like:
+- Number length (16 or 15 digits)
+- Valid credit card number (Luhn algorithm)
+- Date valid (greater or equal that today)
+- CVV length
+
+## Props
+- banksPermited: An array with names of brands allowed (supports Visa, MasterCard, and Amex)

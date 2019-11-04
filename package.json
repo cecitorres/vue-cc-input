@@ -1,6 +1,6 @@
 {
-  "name": "@cecitorres/vue-cc-input",
-  "version": "0.1.1",
+  "name": "vue-cc-input",
+  "version": "0.1.3",
   "author": "Ceci Torres",
   "keywords": [
     "vue",
@@ -16,10 +16,7 @@
   },
   "main": "index.js",
   "module": "index.js",
-  "repository": "git://github.com/cecitorres/vue-cc-input",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
+  "repository": "git://github.com/cecitorres/vue-cc-input.git",
   "dependencies": {
     "core-js": "^2.6.5",
     "vue": "^2.6.10"
