@@ -12,16 +12,16 @@ export const CC_REGEX = {
 };
 
 export const CARD_BRAND_IMGS = {
-  Visa: {
-    name: 'Visa',
-    img: '../assets/images/visa-512.png'
+  VISA: {
+    alt: 'Visa',
+    img: require('../assets/images/visa-512.png')
   },
-  MasterCard: {
-    name: 'Mastercard',
-    img: '../assets/images/mastercard-512.png'
+  MASTERCARD: {
+    alt: 'Mastercard',
+    img: require('../assets/images/mastercard-512.png')
   },
-  AmericanExpress: {
-    name: 'American Express',
-    img: '../assets/images/amex-512.png'
+  AMEX: {
+    alt: 'American Express',
+    img: require('../assets/images/amex-512.png')
   }
 };

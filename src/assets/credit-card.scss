@@ -67,3 +67,80 @@ input:disabled {
   margin-left: 5px;
   padding-bottom: 5px;
 }
+
+
+.relative {
+  position: relative;
+}
+
+.input--cardBrand {
+  position: absolute;
+  top: 24px;
+  right: 15px;
+}
+
+.input--cvv {
+  position: relative;
+  // width: 80%;
+  // float: left;
+  input {
+    width: 100%;
+    box-sizing : border-box;
+    padding: 10px 0px;
+    margin: 5px 0px;
+  }
+}
+
+.cvv__icon__container {
+  width: 18%;
+  // margin-left: 2%;
+  float: left;
+  position: relative;
+}
+
+
+.cc__cvc__icon {
+  display: inline-block;
+  align-self: center;
+  font-size: 16px;
+  width: 25px;
+  text-align: center;
+  color: white;
+  background: $red;
+  height: 25px;
+  border-radius: 50%;
+  margin: 0;
+  line-height: 25px;
+  padding: 0px;
+  position: absolute;
+  top: 12px;
+  right: 6px;
+}
+
+.cc__cvc__helpbox {
+  position: absolute;
+  right: 0px;
+  bottom: 50px;
+  width: 120px;
+  font-size: 10px;
+  padding: 5px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.19);
+  border-radius: 0;
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.19);
+  img {
+    width: 110px;
+  }
+}
+
+.cc__cvc__helpbox__triangle {
+  position: absolute;
+  right: 6px;
+  bottom: 38px;
+  width: 0px;
+  height: 0px;
+  // background-color: red;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid rgba(0, 0, 0, 0.19);
+}

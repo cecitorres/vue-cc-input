@@ -2,9 +2,7 @@
   <div style="font-size: 14px;">
     <div class="input__block relative">
       <p class="">Número de tarjeta</p>
-      <img v-if="ccBankIs(CC_BANKS.VISA)" class="input--cardBrand" src="../assets/images/visa-512.png" height="32px" alt="Visa" />
-      <img v-if="ccBankIs(CC_BANKS.MASTERCARD)" class="input--cardBrand" src="../assets/images/mastercard-512.png" height="32px" alt="Mastercard" />
-      <img v-if="ccBankIs(CC_BANKS.AMEX)" class="input--cardBrand" src="../assets/images/amex-512.png" height="32px" alt="Amex" />
+      <img v-if="showBankImg && ccBank !== ''" class="input--cardBrand" :src="CARD_BRAND_IMGS[ccBank].img" height="32px" :alt="CARD_BRAND_IMGS[ccBank].alt" />
       <input
         class="input input--100"
         :class="{ 'input--error': !validCardNumber && cardNumsBlured }"
@@ -75,9 +73,23 @@
         <p v-if="!validExp && cardExpBlured" class="error">Fecha inválida</p>
       </div>
       <div class="w2 cvv__container">
-        <p bold :space="false">CVV</p>
+        <div>
+          <p bold :space="false">CVV</p>
+          <!-- <div class="w2 cvv__icon__container">
+          </div> -->
+        </div>
         <div class="cvv__input">
           <div class="input--cvv">
+            <div>
+              <p class="cc__cvc__helpbox" v-if="showCVCHelp">
+                <img v-if="ccBank === CC_BANKS.AMEX" src="./assets/images/cvv-amex.png" alt="CVV">
+                <img v-else src="./assets/images/cvv.png" alt="CVV">
+              </p>
+              <p class="cc__cvc__helpbox__triangle" v-if="showCVCHelp"></p>
+
+              <p class="cc__cvc__helpbox__triangle-2" v-if="showCVCHelp"></p>
+            </div>
+            <span class="cc__cvc__icon" @click="switchCVCIcon">?</span>
             <input
               class="input"
               :class="{ 'input--error': !validCVV && CVVBlured }"
@@ -94,23 +106,10 @@
             />
             <p v-if="!validCVV && CVVBlured" class="error">El campo código de seguridad es requerido</p>
           </div>
-          
-          <div class="cvv__icon__container">
-            <div style="padding-top: 10px; position: relative;">
-              <p class="cc__cvc__icon" @click="switchCVCIcon">?</p>
-              <p class="cc__cvc__helpbox" v-if="showCVCHelp">
-                <img v-if="ccBank === CC_BANKS.AMEX" src="../assets/images/cvv-amex.png" alt="CVV">
-                <img v-else src="../assets/images/cvv.png" alt="CVV">
-              </p>
-              <p class="cc__cvc__helpbox__triangle" v-if="showCVCHelp"></p>
-
-              <p class="cc__cvc__helpbox__triangle-2" v-if="showCVCHelp"></p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
-
+    <slot />
     <!-- <div class="input__block">
       <p class="">Nombre del Titular</p>
       <input
@@ -152,6 +151,7 @@
 import {
   CC_BANKS,
   CC_REGEX,
+  CARD_BRAND_IMGS
 } from './utils/constants';
 import {
   CURRENT_MONTH,
@@ -161,10 +161,14 @@ import luhnTest from './utils/luhnAlgorithm';
 
 export default {
   props: {
+    banksPermited: Array,
+    showBankImg: {
+      type: Boolean,
+      default: true
+    },
     useName: Boolean,
     useAddress: Boolean,
     usePostalCode: Boolean,
-    banksPermited: Array
   },
   data() {
     return {
@@ -191,6 +195,7 @@ export default {
       ccLength: 19,
       cvvLength: 3,
       CC_BANKS,
+      CARD_BRAND_IMGS,
       cardNumsBlured: false,
       cardExpBlured: false,
       CVVBlured: false,
@@ -367,74 +372,4 @@ export default {
 
 <style lang="scss">
   @import "./assets/credit-card";
-  .relative {
-    position: relative;
-  }
-
-  .input--cardBrand {
-    position: absolute;
-    top: 24px;
-    right: 15px;
-  }
-
-  .input--cvv {
-    width: 80%;
-    float: left;
-    input {
-      width: 100%;
-      box-sizing : border-box;
-      padding: 10px 0px;
-      margin: 5px 0px;
-    }
-  }
-
-  .cvv__icon__container {
-    width: 18%;
-    margin-left: 2%;
-    float: left;
-    position: relative;
-  }
-
-  .cc__cvc__icon {
-    display: inline-block;
-    align-self: center;
-    font-size: 16px;
-    width: 25px;
-    text-align: center;
-    color: white;
-    background: #1097af;
-    height: 25px;
-    border-radius: 50%;
-    margin: 0;
-    line-height: 25px;
-    padding: 0px;
-  }
-
-  .cc__cvc__helpbox {
-    position: absolute;
-    right: 0px;
-    bottom: 37px;
-    width: 120px;
-    font-size: 10px;
-    padding: 5px;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.19);
-    border-radius: 0;
-    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.19);
-    img {
-      width: 110px;
-    }
-  }
-
-  .cc__cvc__helpbox__triangle {
-    position: absolute;
-    left: 1px;
-    bottom: 20px;
-    width: 0px;
-    height: 0px;
-    // background-color: red;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-top: 12px solid rgba(0, 0, 0, 0.19);
-  }
 </style>
