@@ -110,7 +110,7 @@
       </div>
     </div>
     <slot />
-    <!-- <div class="input__block">
+    <div v-if="useName" class="input__block">
       <p class="">Nombre del Titular</p>
       <input
         class="input input--100"
@@ -119,7 +119,7 @@
         @blur="handlerBluredName"
       />
       <p v-if="!validName && nameBlured" class="error">El campo nombre del titular es requerido</p>
-    </div> -->
+    </div>
 
     <!-- <div class="input__block">
       <p class="">Dirección</p>
@@ -178,7 +178,6 @@ export default {
         ccNumber: '',
         ccExpiration: '',
         ccCvv: ''
-        // ccName: '',
         // ccAddress: ''
         // ccPostalCode: ''
       },
@@ -186,7 +185,6 @@ export default {
         cardNumber: false,
         cardExp: false,
         ccCvv: false
-        // name: false,
         // address: false
         // cp: false
       },
@@ -203,6 +201,12 @@ export default {
       addressBlured: false,
       cpBlured: false
     };
+  },
+  created() {
+    if (this.useName) {
+      this.$set(this.form, 'ccName', '');
+      this.$set(this.validationsPassed, 'name', false);
+    }
   },
   computed: {
     errorCCNumberText() {
