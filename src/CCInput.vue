@@ -1,5 +1,16 @@
 <template>
   <div style="font-size: 14px;">
+    <div v-if="useName" class="input__block">
+      <p class="">Nombre de Tarjetabiente</p>
+      <input
+        class="input input--100"
+        type="text"
+        v-model="form.ccName"
+        @blur="handlerBluredName"
+      />
+      <p v-if="!validName && nameBlured" class="error">El campo nombre de Tarjetabiente es requerido</p>
+    </div>
+
     <div class="input__block relative">
       <p class="">Número de tarjeta</p>
       <img v-if="showBankImg && ccBank !== ''" class="input--cardBrand" :src="CARD_BRAND_IMGS[ccBank].img" height="32px" :alt="CARD_BRAND_IMGS[ccBank].alt" />
@@ -110,16 +121,6 @@
       </div>
     </div>
     <slot />
-    <div v-if="useName" class="input__block">
-      <p class="">Nombre del Titular</p>
-      <input
-        class="input input--100"
-        type="text"
-        v-model="form.ccName"
-        @blur="handlerBluredName"
-      />
-      <p v-if="!validName && nameBlured" class="error">El campo nombre del titular es requerido</p>
-    </div>
 
     <!-- <div class="input__block">
       <p class="">Dirección</p>
