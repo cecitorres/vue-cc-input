@@ -364,11 +364,14 @@ export default {
     validationsPassed: {
       deep: true,
       handler(data) {
-        let info = {};
+        const ccInfo = {
+          ...this.form,
+          isValid: false
+        };
         if (Object.values(data).every(item => item)) {
-          info = this.form;
+          ccInfo.isValid = true;
         }
-        this.$emit('input', info)
+        this.$emit('input', ccInfo)
       }
     }
   }
