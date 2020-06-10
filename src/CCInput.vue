@@ -365,7 +365,9 @@ export default {
       deep: true,
       handler(data) {
         const ccInfo = {
+          // FIXME: ...data (?)
           ...this.form,
+          ccNumber: this.cardNums.replace(/\s+/g, ''),
           isValid: false
         };
         if (Object.values(data).every(item => item)) {
