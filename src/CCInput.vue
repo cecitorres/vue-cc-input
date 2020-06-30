@@ -154,10 +154,7 @@ import {
   CC_REGEX,
   CARD_BRAND_IMGS
 } from './utils/constants';
-import {
-  CURRENT_MONTH,
-  CURRENT_YEAR
-} from './utils/currentDates';
+import isAfter from 'date-fns/isAfter';
 import luhnTest from './utils/luhnAlgorithm';
 
 export default {
@@ -236,8 +233,7 @@ export default {
       return testPassed.some(test => test === true) && luhnTest(number);
     },
     validExp() {
-      return this.expYear > CURRENT_YEAR
-        || (this.expYear === CURRENT_YEAR && this.expMonth >= CURRENT_MONTH);
+      return isAfter(new Date(this.expYear, this.expMonth, 1), new Date());
     },
     validCVV() {
       return this.form.ccCvv.length === this.cvvLength;

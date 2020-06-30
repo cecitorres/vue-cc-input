@@ -19,6 +19,7 @@
   "repository": "git://github.com/cecitorres/vue-cc-input.git",
   "dependencies": {
     "core-js": "^2.6.5",
+    "date-fns": "^2.14.0",
     "vue": "^2.6.10"
   },
   "devDependencies": {
