@@ -111,8 +111,8 @@
               placeholder="cvv"
               :maxlength="cvvLength"
               ref="cvc"
-              @keyup="validateCVC"
               v-model.lazy="form.ccCvv"
+              @input="validateCVC"
               @change="handlerBluredCVV"
             />
             <p v-if="!validCVV && CVVBlured" class="error">El campo código de seguridad es requerido</p>
