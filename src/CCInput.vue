@@ -42,7 +42,7 @@
             :class="{ 'input--error': !validExp && cardExpBlured }"
             v-model="expMonth"
             @change="handlerBluredCardExp"
-            ref="expMont"
+            ref="expMonth"
           >
             <option value="">Mes</option>
             <option value="01">01</option>
@@ -176,15 +176,11 @@ export default {
         ccNumber: '',
         ccExpiration: '',
         ccCvv: ''
-        // ccAddress: ''
-        // ccPostalCode: ''
       },
       validationsPassed: {
         cardNumber: false,
         cardExp: false,
         ccCvv: false
-        // address: false
-        // cp: false
       },
       showCVCHelp: false,
       ccBank: '',
@@ -233,6 +229,7 @@ export default {
       return testPassed.some(test => test === true) && luhnTest(number);
     },
     validExp() {
+      if (this.expYear === '' || this.expMonth === '') return false;
       return isAfter(new Date(this.expYear, this.expMonth, 1), new Date());
     },
     validCVV() {
@@ -310,7 +307,7 @@ export default {
       }
       if (this.validExp) {
         this.validationsPassed.cardExp = true;
-      } else if (this.expMonth !== '' && this.expYear !== '') {
+      } else {
         this.validationsPassed.cardExp = false;
       }
     },
@@ -357,16 +354,16 @@ export default {
       }
       this.form.ccNumber = val;
     },
-    validationsPassed: {
+    form: {
       deep: true,
       handler(data) {
         const ccInfo = {
           // FIXME: ...data (?)
-          ...this.form,
+          ...data,
           ccNumber: this.cardNums.replace(/\s+/g, ''),
           isValid: false
         };
-        if (Object.values(data).every(item => item)) {
+        if (Object.values(this.validationsPassed).every(item => item)) {
           ccInfo.isValid = true;
         }
         this.$emit('input', ccInfo)
