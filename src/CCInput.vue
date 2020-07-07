@@ -5,8 +5,8 @@
       <input
         class="input input--100"
         type="text"
-        v-model="form.ccName"
-        @blur="handlerBluredName"
+        v-model.lazy="form.ccName"
+        @change="handlerBluredName"
       />
       <p v-if="!validName && nameBlured" class="error">El campo nombre de Tarjetabiente es requerido</p>
     </div>
@@ -21,9 +21,9 @@
         inputmode="numeric"
         placeholder="0000 0000 0000 0000"
         :maxlength="ccLength"
-        @keyup="validateCCNumber"
-        v-model="form.ccNumber"
-        @blur="handlerBluredCardNumber"
+        v-model.lazy="form.ccNumber"
+        @change="doValidationToCardNumber"
+        @input="addSpacesToCardNumbersInput"
       />
       <p class="error" v-if="cardNumsBlured && form.ccNumber.length !== ccLength">
         {{ errorCCNumberText }}
@@ -112,8 +112,8 @@
               :maxlength="cvvLength"
               ref="cvc"
               @keyup="validateCVC"
-              v-model="form.ccCvv"
-              @blur="handlerBluredCVV"
+              v-model.lazy="form.ccCvv"
+              @change="handlerBluredCVV"
             />
             <p v-if="!validCVV && CVVBlured" class="error">El campo código de seguridad es requerido</p>
           </div>
@@ -249,7 +249,7 @@ export default {
     switchCVCIcon() {
       this.showCVCHelp = !this.showCVCHelp;
     },
-    validateCCNumber() {
+    setCCBank() {
       this.$nextTick(() => {
         if (this.form.ccNumber.length > 0) {
           this.form.ccNumber = this.form.ccNumber.substring(0, this.ccLength);
@@ -276,6 +276,21 @@ export default {
         }
       });
     },
+    addSpacesToCardNumbersInput(e) {
+      let val = '';
+      const typingValue = e.target.value
+      if (this.ccBank === CC_BANKS.VISA || this.ccBank === CC_BANKS.MASTERCARD || this.ccBank === '') {
+        val = typingValue.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim();
+      } else if (this.ccBank === CC_BANKS.AMEX) {
+        if (typingValue.length === 5 || typingValue.length === 12) {
+          const position = typingValue.length - 1;
+          val = [typingValue.slice(0, position), ' ', typingValue.slice(position)].join('').trim();
+        } else {
+          val = typingValue;
+        }
+      }
+      e.target.value = val;
+    },
     validateCVC() {
       this.$nextTick(() => {
         if (this.form.ccCvv.length > 0) {
@@ -284,89 +299,53 @@ export default {
         }
       });
     },
-    handlerBluredCardNumber() {
+    doValidationToCardNumber() {
+      this.setCCBank();
       this.cardNumsBlured = true;
-      if (this.validCardNumber) {
-        this.validationsPassed.cardNumber = true;
-      } else {
-        this.validationsPassed.cardNumber = false;
-      }
+      this.updateValidation('cardNumber', this.validCardNumber);
     },
     handlerBluredCVV() {
       this.CVVBlured = true;
-      if (this.validCVV) {
-        this.validationsPassed.ccCvv = true;
-      } else {
-        this.validationsPassed.ccCvv = false;
-      }
+      this.updateValidation('ccCvv', this.validCVV);
     },
     handlerBluredCardExp() {
       this.form.ccExpiration = `${this.expMonth}${this.expYear.slice(-2)}`;
       if (this.expYear !== '') {
         this.cardExpBlured = true;
       }
-      if (this.validExp) {
-        this.validationsPassed.cardExp = true;
-      } else {
-        this.validationsPassed.cardExp = false;
-      }
+      this.updateValidation('cardExp', this.validExp);
     },
     handlerBluredName() {
       this.nameBlured = true;
-      if (this.validName) {
-        this.validationsPassed.name = true;
-      } else {
-        this.validationsPassed.name = false;
-      }
+      this.updateValidation('name', this.validName);
     },
     handlerBluredAddress() {
       this.addressBlured = true;
-      if (this.validAddress) {
-        this.validationsPassed.address = true;
-      } else {
-        this.validationsPassed.address = false;
-      }
+      this.updateValidation('address', this.validAddress);
     },
     handlerBluredCP() {
       this.cpBlured = true;
-      if (this.validCP) {
-        this.validationsPassed.cp = true;
-      } else {
-        this.validationsPassed.cp = false;
-      }
+      this.updateValidation('cp', this.validCP);
+    },
+    updateValidation(name, validationMethod) {
+      this.validationsPassed[name] = validationMethod;
     },
     ccBankIs(bank) {
       return this.ccBank === bank;
     }
   },
   watch: {
-    cardNums() {
-      let val = '';
-      if (this.ccBank === CC_BANKS.VISA || this.ccBank === CC_BANKS.MASTERCARD || this.ccBank === '') {
-        val = this.form.ccNumber.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim();
-      } else if (this.ccBank === CC_BANKS.AMEX) {
-        if (this.form.ccNumber.length === 5 || this.form.ccNumber.length === 12) {
-          const position = this.form.ccNumber.length - 1;
-          val = [this.form.ccNumber.slice(0, position), ' ', this.form.ccNumber.slice(position)].join('').trim();
-        } else {
-          val = this.form.ccNumber;
-        }
-      }
-      this.form.ccNumber = val;
-    },
     form: {
       deep: true,
       handler(data) {
-        const ccInfo = {
-          // FIXME: ...data (?)
+        const vueCCInputValues = {
           ...data,
           ccNumber: this.cardNums.replace(/\s+/g, ''),
           isValid: false
         };
-        if (Object.values(this.validationsPassed).every(item => item)) {
-          ccInfo.isValid = true;
-        }
-        this.$emit('input', ccInfo)
+
+        if (Object.values(this.validationsPassed).every(item => item)) vueCCInputValues.isValid = true;
+        this.$emit('input', vueCCInputValues)
       }
     }
   }
