@@ -259,28 +259,24 @@ export default {
         localCardNumber = localCardNumber.replace(/([a-zA-Z,._])/g, '');
         if (localCardNumber.charAt(0) === '4') {
           this.brandCard = CC_BANKS.VISA;
-          this.ccLength = 19;
-          this.cvvLength = 3;
         } else if (/^5[1-5]/.test(localCardNumber.substring(0, 2))) {
           this.brandCard = CC_BANKS.MASTERCARD;
-          this.ccLength = 19;
-          this.cvvLength = 3;
         } else if (this.banksPermited.find(bank => bank === 'Amex') && /^3[47]/.test(localCardNumber.substring(0, 2))) {
           this.brandCard = CC_BANKS.AMEX;
-          this.ccLength = 17;
-          this.cvvLength = 4;
         } else {
           this.brandCard = '';
-          this.ccLength = 19;
-          this.cvvLength = 3;
         }
         resolve();
       });
     },
     async addSpacesToCardNumbersInput(e) {
-      let cardNumberWithSpaces = '';
       const typingValue = e.target.value;
+      if (typingValue.length === 0) {
+        this.brandCard = '';
+        return;
+      }
       await this.setBrandCard(String(typingValue));
+      let cardNumberWithSpaces = '';
       if (this.brandCard === CC_BANKS.VISA || this.brandCard === CC_BANKS.MASTERCARD || this.brandCard === '') {
         cardNumberWithSpaces = typingValue.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim();
       } else if (this.brandCard === CC_BANKS.AMEX) {
@@ -345,6 +341,24 @@ export default {
         if (Object.values(this.validationsPassed).every(item => item)) vueCCInputValues.isValid = true;
         this.$emit('input', vueCCInputValues)
       }
+    },
+    brandCard(value) {
+      const inputConfigsByBrandType = {
+        [CC_BANKS.AMEX]: {
+          inputLength: 17,
+          cvvLength: 4
+        },
+        default: {
+          inputLength: 19,
+          cvvLength: 3
+        }
+      };
+      this.ccLength = value === CC_BANKS.AMEX
+        ? inputConfigsByBrandType[CC_BANKS.AMEX].inputLength
+        : inputConfigsByBrandType.default.inputLength;
+      this.cvvLength = value === CC_BANKS.AMEX
+        ? inputConfigsByBrandType[CC_BANKS.AMEX].cvvLength
+        : inputConfigsByBrandType.default.cvvLength;
     }
   }
 };
