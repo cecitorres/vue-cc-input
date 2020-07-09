@@ -13,7 +13,7 @@
 
     <div class="input__block relative">
       <p class="">Número de tarjeta</p>
-      <img v-if="showBankImg && ccBank !== ''" class="input--cardBrand" :src="CARD_BRAND_IMGS[ccBank].img" height="32px" :alt="CARD_BRAND_IMGS[ccBank].alt" />
+      <img v-if="showBankImg && brandCard !== ''" class="input--cardBrand" :src="CARD_BRAND_IMGS[brandCard].img" height="32px" :alt="CARD_BRAND_IMGS[brandCard].alt" />
       <input
         class="input input--100"
         :class="{ 'input--error': !validCardNumber && cardNumsBlured }"
@@ -93,7 +93,7 @@
           <div class="input--cvv">
             <div>
               <p class="cc__cvc__helpbox" v-if="showCVCHelp">
-                <img v-if="ccBank === CC_BANKS.AMEX" src="./assets/images/cvv-amex.png" alt="CVV">
+                <img v-if="brandCard === CC_BANKS.AMEX" src="./assets/images/cvv-amex.png" alt="CVV">
                 <img v-else src="./assets/images/cvv.png" alt="CVV">
               </p>
               <p class="cc__cvc__helpbox__triangle" v-if="showCVCHelp"></p>
@@ -183,7 +183,7 @@ export default {
         ccCvv: false
       },
       showCVCHelp: false,
-      ccBank: '',
+      brandCard: '',
       ccLength: 19,
       cvvLength: 3,
       CC_BANKS,
@@ -204,7 +204,7 @@ export default {
   },
   computed: {
     errorCCNumberText() {
-      return this.ccBank === CC_BANKS.AMEX ? 'Ingresa los 15 dígitos de tu tarjeta' : 'Ingresa los 16 dígitos de tu tarjeta';
+      return this.brandCard === CC_BANKS.AMEX ? 'Ingresa los 15 dígitos de tu tarjeta' : 'Ingresa los 16 dígitos de tu tarjeta';
     },
     cardNums() {
       return this.form.ccNumber;
@@ -249,58 +249,56 @@ export default {
     switchCVCIcon() {
       this.showCVCHelp = !this.showCVCHelp;
     },
-    setCCBank() {
-      this.$nextTick(() => {
-        if (this.form.ccNumber.length > 0) {
-          this.form.ccNumber = this.form.ccNumber.substring(0, this.ccLength);
-          this.form.ccNumber = this.form.ccNumber.replace(/([a-zA-Z,._])/g, '');
-          if (this.form.ccNumber.charAt(0) === '4') {
-            this.ccBank = CC_BANKS.VISA;
-            this.ccLength = 19;
-            this.cvvLength = 3;
-          } else if (/^5[1-5]/.test(this.form.ccNumber.substring(0, 2))) {
-            this.ccBank = CC_BANKS.MASTERCARD;
-            this.ccLength = 19;
-            this.cvvLength = 3;
-          } else if (this.banksPermited.find(bank => bank === 'Amex') && /^3[47]/.test(this.form.ccNumber.substring(0, 2))) {
-            this.ccBank = CC_BANKS.AMEX;
-            this.ccLength = 17;
-            this.cvvLength = 4;
-          } else {
-            this.ccBank = '';
-            this.ccLength = 19;
-            this.cvvLength = 3;
-          }
-        } else {
-          this.ccBank = '';
+    setBrandCard(cardNumber) {
+      return new Promise((resolve) => {
+        if (cardNumber.length === 0) {
+          this.brandCard = '';
+          return;
         }
+        let localCardNumber = cardNumber.substring(0, this.ccLength);
+        localCardNumber = localCardNumber.replace(/([a-zA-Z,._])/g, '');
+        if (localCardNumber.charAt(0) === '4') {
+          this.brandCard = CC_BANKS.VISA;
+          this.ccLength = 19;
+          this.cvvLength = 3;
+        } else if (/^5[1-5]/.test(localCardNumber.substring(0, 2))) {
+          this.brandCard = CC_BANKS.MASTERCARD;
+          this.ccLength = 19;
+          this.cvvLength = 3;
+        } else if (this.banksPermited.find(bank => bank === 'Amex') && /^3[47]/.test(localCardNumber.substring(0, 2))) {
+          this.brandCard = CC_BANKS.AMEX;
+          this.ccLength = 17;
+          this.cvvLength = 4;
+        } else {
+          this.brandCard = '';
+          this.ccLength = 19;
+          this.cvvLength = 3;
+        }
+        resolve();
       });
     },
-    addSpacesToCardNumbersInput(e) {
-      let val = '';
-      const typingValue = e.target.value
-      if (this.ccBank === CC_BANKS.VISA || this.ccBank === CC_BANKS.MASTERCARD || this.ccBank === '') {
-        val = typingValue.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim();
-      } else if (this.ccBank === CC_BANKS.AMEX) {
+    async addSpacesToCardNumbersInput(e) {
+      let cardNumberWithSpaces = '';
+      const typingValue = e.target.value;
+      await this.setBrandCard(String(typingValue));
+      if (this.brandCard === CC_BANKS.VISA || this.brandCard === CC_BANKS.MASTERCARD || this.brandCard === '') {
+        cardNumberWithSpaces = typingValue.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim();
+      } else if (this.brandCard === CC_BANKS.AMEX) {
         if (typingValue.length === 5 || typingValue.length === 12) {
           const position = typingValue.length - 1;
-          val = [typingValue.slice(0, position), ' ', typingValue.slice(position)].join('').trim();
+          cardNumberWithSpaces = [typingValue.slice(0, position), ' ', typingValue.slice(position)].join('').trim();
         } else {
-          val = typingValue;
+          cardNumberWithSpaces = typingValue;
         }
       }
-      e.target.value = val;
+      e.target.value = cardNumberWithSpaces;
     },
-    validateCVC() {
-      this.$nextTick(() => {
-        if (this.form.ccCvv.length > 0) {
-          this.form.ccCvv = this.form.ccCvv.substring(0, this.cvvLength);
-          this.form.ccCvv = this.form.ccCvv.replace(/([a-zA-Z,._])/g, '');
-        }
-      });
+    validateCVC(e) {
+      const typingValue = e.target.value
+      let filteredText = typingValue.substring(0, this.cvvLength);
+      e.target.value = filteredText;
     },
     doValidationToCardNumber() {
-      this.setCCBank();
       this.cardNumsBlured = true;
       this.updateValidation('cardNumber', this.validCardNumber);
     },
@@ -331,7 +329,7 @@ export default {
       this.validationsPassed[name] = validationMethod;
     },
     ccBankIs(bank) {
-      return this.ccBank === bank;
+      return this.brandCard === bank;
     }
   },
   watch: {
