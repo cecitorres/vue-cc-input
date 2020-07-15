@@ -21,9 +21,9 @@
         inputmode="numeric"
         placeholder="0000 0000 0000 0000"
         :maxlength="ccLength"
-        v-model.lazy="form.ccNumber"
-        @change="doValidationToCardNumber"
+        v-model="form.ccNumber"
         @input="addSpacesToCardNumbersInput"
+        @change="doValidationToCardNumber"
       />
       <p class="error" v-if="cardNumsBlured && form.ccNumber.length !== ccLength">
         {{ errorCCNumberText }}
@@ -103,7 +103,7 @@
             <span class="cc__cvc__icon" @click="switchCVCIcon">?</span>
             <input
               class="input"
-              :class="{ 'input--error': !validCVV && CVVBlured }"
+              :class="{ 'input--error': !validCVV && form.ccCvv !== '' }"
               type="number"
               name="ccCvv"
               inputmode="numeric"
@@ -115,7 +115,7 @@
               @input="validateCVC"
               @change="handlerBluredCVV"
             />
-            <p v-if="!validCVV && CVVBlured" class="error">El campo código de seguridad es requerido</p>
+            <p v-if="!validCVV && form.ccCvv !== ''" class="error">El campo código de seguridad es requerido</p>
           </div>
         </div>
       </div>
@@ -271,32 +271,41 @@ export default {
     },
     async addSpacesToCardNumbersInput(e) {
       const typingValue = e.target.value;
-      if (typingValue.length === 0) {
-        this.brandCard = '';
-        return;
-      }
-      await this.setBrandCard(String(typingValue));
-      let cardNumberWithSpaces = '';
-      if (this.brandCard === CC_BANKS.VISA || this.brandCard === CC_BANKS.MASTERCARD || this.brandCard === '') {
-        cardNumberWithSpaces = typingValue.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim();
-      } else if (this.brandCard === CC_BANKS.AMEX) {
-        if (typingValue.length === 5 || typingValue.length === 12) {
-          const position = typingValue.length - 1;
-          cardNumberWithSpaces = [typingValue.slice(0, position), ' ', typingValue.slice(position)].join('').trim();
-        } else {
-          cardNumberWithSpaces = typingValue;
+      let copyETargetValue = e.target.value
+      if (typingValue) {
+        await this.setBrandCard(String(typingValue));
+        let cardNumberWithSpaces = '';
+        if (this.brandCard === CC_BANKS.VISA || this.brandCard === CC_BANKS.MASTERCARD || this.brandCard === '') {
+          cardNumberWithSpaces = typingValue.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim();
+        } else if (this.brandCard === CC_BANKS.AMEX) {
+          if (typingValue.length === 5 || typingValue.length === 12) {
+            const position = typingValue.length - 1;
+            cardNumberWithSpaces = [typingValue.slice(0, position), ' ', typingValue.slice(position)].join('').trim();
+          } else {
+            cardNumberWithSpaces = typingValue;
+          }
         }
+        // e.target.value = cardNumberWithSpaces;
+        copyETargetValue = cardNumberWithSpaces;
+      } else {
+        this.brandCard = '';
+        // e.target.value = null;
+        copyETargetValue = ''
       }
-      e.target.value = cardNumberWithSpaces;
+      e.target.value = copyETargetValue;
+      this.form.ccNumber = copyETargetValue;
+      // console.log(e.target.value, typeof e.target.value)
     },
     validateCVC(e) {
       const typingValue = e.target.value
       let filteredText = typingValue.substring(0, this.cvvLength);
       e.target.value = filteredText;
     },
-    doValidationToCardNumber() {
+    doValidationToCardNumber(e) {
+      this.form.ccNumber = e.target.value;
       this.cardNumsBlured = true;
       this.updateValidation('cardNumber', this.validCardNumber);
+      this.handlerBluredCVV();
     },
     handlerBluredCVV() {
       this.CVVBlured = true;
