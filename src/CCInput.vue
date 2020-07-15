@@ -193,7 +193,8 @@ export default {
       CVVBlured: false,
       nameBlured: false,
       addressBlured: false,
-      cpBlured: false
+      cpBlured: false,
+      cardDataIsComplete: false
     };
   },
   created() {
@@ -338,18 +339,19 @@ export default {
     }
   },
   watch: {
-    form: {
+    validationsPassed: {
       deep: true,
       handler(data) {
-        const vueCCInputValues = {
-          ...data,
-          ccNumber: this.cardNums.replace(/\s+/g, ''),
-          isValid: false
-        };
-
-        if (Object.values(this.validationsPassed).every(item => item)) vueCCInputValues.isValid = true;
-        this.$emit('input', vueCCInputValues)
+        this.cardDataIsComplete = Object.values(data).every(item => item);
       }
+    },
+    cardDataIsComplete() {
+      const vueCCInputValues = {
+          ...this.form,
+          ccNumber: this.cardNums.replace(/\s+/g, ''),
+          isValid: this.cardDataIsComplete
+        };
+      this.$emit('input', vueCCInputValues);
     },
     brandCard(value) {
       const inputConfigsByBrandType = {
