@@ -345,13 +345,16 @@ export default {
         this.cardDataIsComplete = Object.values(data).every(item => item);
       }
     },
-    cardDataIsComplete() {
-      const vueCCInputValues = {
-          ...this.form,
-          ccNumber: this.cardNums.replace(/\s+/g, ''),
-          isValid: this.cardDataIsComplete
-        };
-      this.$emit('input', vueCCInputValues);
+    form: {
+      deep: true,
+      handler(data) {
+        const vueCCInputValues = {
+            ...data,
+            ccNumber: this.cardNums.replace(/\s+/g, ''),
+            isValid: this.cardDataIsComplete
+          };
+        this.$emit('input', vueCCInputValues);
+      }
     },
     brandCard(value) {
       const inputConfigsByBrandType = {
