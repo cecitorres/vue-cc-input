@@ -193,8 +193,7 @@ export default {
       CVVBlured: false,
       nameBlured: false,
       addressBlured: false,
-      cpBlured: false,
-      cardDataIsComplete: false
+      cpBlured: false
     };
   },
   created() {
@@ -244,6 +243,11 @@ export default {
     },
     validCP() {
       return this.form.ccPostalCode !== '';
+    },
+    isValid() {
+      // TODO: add other validations for rest of inputs
+      const extraValidations = this.useName ? this.validName : true;
+      return this.validCardNumber && this.validExp && this.validCVV && extraValidations;
     }
   },
   methods: {
@@ -339,19 +343,13 @@ export default {
     }
   },
   watch: {
-    validationsPassed: {
-      deep: true,
-      handler(data) {
-        this.cardDataIsComplete = Object.values(data).every(item => item);
-      }
-    },
     form: {
       deep: true,
       handler(data) {
         const vueCCInputValues = {
             ...data,
             ccNumber: this.cardNums.replace(/\s+/g, ''),
-            isValid: this.cardDataIsComplete
+            isValid: this.isValid
           };
         this.$emit('input', vueCCInputValues);
       }
