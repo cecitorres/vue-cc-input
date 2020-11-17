@@ -111,7 +111,7 @@
               placeholder="cvv"
               :maxlength="cvvLength"
               ref="cvc"
-              v-model.lazy="form.ccCvv"
+              v-model="form.ccCvv"
               @input="validateCVC"
               @change="handlerBluredCVV"
             />
