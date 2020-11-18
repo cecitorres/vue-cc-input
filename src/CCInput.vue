@@ -103,7 +103,7 @@
             <span class="cc__cvc__icon" @click="switchCVCIcon">?</span>
             <input
               class="input"
-              :class="{ 'input--error': !validCVV && form.ccCvv !== '' }"
+              :class="{ 'input--error': !validCVV && CVVBlured }"
               type="number"
               name="ccCvv"
               inputmode="numeric"
@@ -111,11 +111,11 @@
               placeholder="cvv"
               :maxlength="cvvLength"
               ref="cvc"
-              v-model="form.ccCvv"
+              :value="form.ccCvv"
               @input="validateCVC"
               @change="handlerBluredCVV"
             />
-            <p v-if="!validCVV && form.ccCvv !== ''" class="error">El campo código de seguridad es requerido</p>
+            <p v-if="!validCVV && CVVBlured" class="error">El campo código de seguridad es requerido</p>
           </div>
         </div>
       </div>
@@ -305,12 +305,12 @@ export default {
       const typingValue = e.target.value
       let filteredText = typingValue.substring(0, this.cvvLength);
       e.target.value = filteredText;
+      this.form.ccCvv = filteredText;
     },
     doValidationToCardNumber(e) {
       this.form.ccNumber = e.target.value;
       this.cardNumsBlured = true;
       this.updateValidation('cardNumber', this.validCardNumber);
-      this.handlerBluredCVV();
     },
     handlerBluredCVV() {
       this.CVVBlured = true;
